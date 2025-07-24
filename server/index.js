@@ -1,21 +1,36 @@
+// server/index.js
+
 const express = require('express');
-const path = require('path');
-const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const cors = require('cors');
+require('dotenv').config(); // Load environment variables
+
+const taskRoutes = require('./routes/tasks'); // ✅ fixed path
 
 const app = express();
 
-const routeTasks = require('./src/routes/tasks');
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-app.use(express.static(path.join(__dirname, 'client/build')));
-app.use(bodyParser.json());
+// Routes
+app.use('/tasks', taskRoutes);
 
-app.use('/api/tasks', routeTasks, (req, res) => res.sendStatus(401));
+// Database Connection
+const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGODB_URI;
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname + '/client/build/index.html'));
-});
-
-const port = process.env.PORT || 5000;
-app.listen(port);
-
-console.log(`listening on ${port}`);
+mongoose
+  .connect(MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log('✅ Connected to MongoDB');
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+    });
+  })
+  .catch((error) => {
+    console.error('❌ MongoDB connection error:', error.message);
+  });

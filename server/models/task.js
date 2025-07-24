@@ -1,10 +1,11 @@
-const mongoose = require('../db');
+// server/models/task.js
 
-const task = new mongoose.Schema({
-  title: { type: String, required: true },
-  done: { type: Boolean, default: false }
+const mongoose = require('mongoose'); // Only mongoose is needed
+
+const taskSchema = new mongoose.Schema({
+  title: String,
+  completed: Boolean,
 });
 
-const Task = mongoose.model('Task', task);
-
+const Task = mongoose.model('Task', taskSchema);
 module.exports = Task;
